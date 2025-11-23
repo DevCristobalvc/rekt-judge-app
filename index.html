@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REKT JUDGE // Human Validation Terminal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Terminal Header -->
+    <header class="terminal-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1 class="glitch" data-text="[ REKT JUDGE ]">[ REKT JUDGE ]</h1>
+                <p class="subtitle">// HUMAN VALIDATION TERMINAL v2.0</p>
+            </div>
+            <div class="connection-status">
+                <div id="connectionStatus" class="status-indicator offline">
+                    <span class="status-dot"></span>
+                    <span class="status-text">DISCONNECTED</span>
+                </div>
+                <button id="connectBtn" class="terminal-btn primary">
+                    <span class="btn-icon">▶</span> CONNECT_ADMIN_WALLET
+                </button>
+            </div>
+        </div>
+        <div id="adminInfo" class="admin-info" style="display: none;">
+            <span class="label">ADMIN:</span>
+            <span id="adminAddress" class="monospace"></span>
+            <span class="separator">|</span>
+            <span class="label">PERMS:</span>
+            <span class="badge badge-success">ROOT</span>
+        </div>
+    </header>
+
+    <!-- Stats Dashboard -->
+    <section id="statsSection" class="stats-section" style="display: none;">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="totalHumans">0</div>
+                <div class="stat-label">TOTAL_HUMANS</div>
+            </div>
+            <div class="stat-box validated">
+                <div class="stat-icon">✓</div>
+                <div class="stat-value" id="validatedCount">0</div>
+                <div class="stat-label">VALIDATED</div>
+            </div>
+            <div class="stat-box pending">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-value" id="pendingCount">0</div>
+                <div class="stat-label">PENDING</div>
+            </div>
+            <div class="stat-box events">
+                <div class="stat-icon">🎪</div>
+                <div class="stat-value" id="totalEvents">0</div>
+                <div class="stat-label">EVENTS</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terminal Tabs -->
+    <nav id="tabsSection" class="terminal-tabs" style="display: none;">
+        <button class="tab-btn active" data-tab="gallery">
+            <span class="tab-icon">▶</span> GALLERY
+        </button>
+        <button class="tab-btn" data-tab="events">
+            <span class="tab-icon">▶</span> EVENTS
+        </button>
+        <button class="tab-btn" data-tab="logs">
+            <span class="tab-icon">▶</span> SYSTEM_LOGS
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Gallery Tab -->
+        <section id="galleryTab" class="tab-content active">
+            <div class="terminal-window">
+                <div class="window-header">
+                    <span class="window-title">// PARTICIPANT_VALIDATION_INTERFACE</span>
+                    <div class="filter-controls">
+                        <button class="filter-btn active" data-filter="all">
+                            ALL <span class="count" id="filterAllCount">0</span>
+                        </button>
+                        <button class="filter-btn" data-filter="validated">
+                            VALIDATED <span class="count" id="filterValidatedCount">0</span>
+                        </button>
+                        <button class="filter-btn" data-filter="pending">
+                            PENDING <span class="count" id="filterPendingCount">0</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div id="loadingGallery" class="loading-state">
+                        <div class="loader"></div>
+                        <p class="loading-text">LOADING_PARTICIPANTS...</p>
+                    </div>
+                    <div id="galleryGrid" class="gallery-grid" style="display: none;"></div>
+                    <div id="emptyGallery" class="empty-state" style="display: none;">
+                        <div class="empty-icon">[ ! ]</div>
+                        <p>NO_PARTICIPANTS_FOUND</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Events Tab -->
+        <section id="eventsTab" class="tab-content">
+            <div class="terminal-window">
+                <div class="window-header">
+                    <span class="window-title">// EVENT_MANAGEMENT_SYSTEM</span>
+                    <button id="createEventBtn" class="terminal-btn small">
+                        <span class="btn-icon">+</span> CREATE_EVENT
+                    </button>
+                </div>
+                <div class="window-body">
+                    <!-- Create Event Form -->
+                    <div id="createEventForm" class="create-form" style="display: none;">
+                        <h3 class="form-title">[ NEW_EVENT ]</h3>
+                        <div class="form-group">
+                            <label class="form-label">EVENT_NAME:</label>
+                            <input type="text" id="eventNameInput" class="terminal-input" placeholder="Enter event name...">
+                        </div>
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label class="form-label">PARTICIPANTS: <span id="selectedCount">0</span> SELECTED</label>
+                                <button id="selectAllBtn" class="link-btn">SELECT_ALL_VALIDATED</button>
+                            </div>
+                            <div id="participantsList" class="participants-list">
+                                <div class="loading-state">
+                                    <div class="loader small"></div>
+                                    <p>LOADING_VALIDATED_HUMANS...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="submitEventBtn" class="terminal-btn primary">
+                                <span class="btn-icon">✓</span> CREATE_EVENT
+                            </button>
+                            <button id="cancelEventBtn" class="terminal-btn">
+                                <span class="btn-icon">✗</span> CANCEL
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Events List -->
+                    <div id="eventsList" class="events-list">
+                        <div id="loadingEvents" class="loading-state">
+                            <div class="loader"></div>
+                            <p class="loading-text">LOADING_EVENTS...</p>
+                        </div>
+                        <div id="eventsGrid" class="events-grid" style="display: none;"></div>
+                        <div id="emptyEvents" class="empty-state" style="display: none;">
+                            <div class="empty-icon">[ ! ]</div>
+                            <p>NO_EVENTS_CREATED</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logs Tab -->
+        <section id="logsTab" class="tab-content">
+            <div class="terminal-window">
+                <div class="window-header">
+                    <span class="window-title">// SYSTEM_ACTIVITY_LOG</span>
+                    <button id="clearLogsBtn" class="terminal-btn small">CLEAR</button>
+                </div>
+                <div class="window-body">
+                    <div id="systemLogs" class="system-logs">
+                        <div class="log-entry info">
+                            <span class="log-time">[00:00:00]</span>
+                            <span class="log-type">[INFO]</span>
+                            <span class="log-message">System initialized</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close">×</button>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="Full size">
+                <div class="modal-info">
+                    <div class="info-row">
+                        <span class="info-label">ADDRESS:</span>
+                        <span id="modalAddress" class="monospace"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">IPFS_HASH:</span>
+                        <span id="modalIpfs" class="monospace"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">STATUS:</span>
+                        <span id="modalStatus"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@11/dist/stellar-sdk.min.js"></script>
+    <script src="config.js"></script>
+    <script src="contractService.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

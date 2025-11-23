@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REKT JUDGE - Demo Test</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            text-align: center;
+        }
+        .test-card {
+            background: #111;
+            border: 2px solid #00ff41;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a1a1a;
+            border-left: 4px solid #00ff41;
+        }
+        .btn {
+            background: #00ff41;
+            color: #0a0a0a;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 1em;
+        }
+        .btn:hover {
+            box-shadow: 0 0 20px #00ff41;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border: 1px solid #666;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #00ff88; }
+        .error { color: #ff0040; }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h1>REKT JUDGE</h1>
+        <p>Development Test Page</p>
+        
+        <div class="status">
+            <p>✅ HTML Loaded</p>
+            <p>✅ CSS Applied</p>
+            <p id="jsStatus">⏳ Checking JavaScript...</p>
+            <p id="stellarStatus">⏳ Checking Stellar SDK...</p>
+            <p id="freighterStatus">⏳ Checking Freighter Wallet...</p>
+        </div>
+
+        <button class="btn" onclick="runTests()">RUN TESTS</button>
+        <button class="btn" onclick="window.location.href='index.html'">LAUNCH APP</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@11/dist/stellar-sdk.min.js"></script>
+    <script src="config.js"></script>
+    
+    <script>
+        function log(message, type = 'info') {
+            const result = document.getElementById('result');
+            const className = type === 'error' ? 'error' : 'success';
+            result.innerHTML += `<div class="${className}">[${type.toUpperCase()}] ${message}</div>`;
+        }
+
+        function checkJavaScript() {
+            document.getElementById('jsStatus').innerHTML = '✅ JavaScript Enabled';
+            log('JavaScript is working correctly', 'success');
+        }
+
+        function checkStellarSDK() {
+            if (typeof StellarSdk !== 'undefined') {
+                document.getElementById('stellarStatus').innerHTML = '✅ Stellar SDK Loaded';
+                log(`Stellar SDK version loaded successfully`, 'success');
+                return true;
+            } else {
+                document.getElementById('stellarStatus').innerHTML = '❌ Stellar SDK Missing';
+                log('Stellar SDK not found - check CDN connection', 'error');
+                return false;
+            }
+        }
+
+        function checkFreighter() {
+            if (window.freighter) {
+                document.getElementById('freighterStatus').innerHTML = '✅ Freighter Installed';
+                log('Freighter wallet extension detected', 'success');
+                return true;
+            } else {
+                document.getElementById('freighterStatus').innerHTML = '⚠️ Freighter Not Installed';
+                log('Freighter wallet not detected - install from browser extension store', 'error');
+                return false;
+            }
+        }
+
+        function checkConfig() {
+            if (typeof CONFIG !== 'undefined') {
+                log(`Contract ID: ${CONFIG.CONTRACT_ID}`, 'success');
+                log(`Network: ${CONFIG.NETWORK}`, 'success');
+                log(`Admin: ${CONFIG.ADMIN_ADDRESS}`, 'success');
+                return true;
+            } else {
+                log('Config.js not loaded', 'error');
+                return false;
+            }
+        }
+
+        async function testContractConnection() {
+            try {
+                if (!window.StellarSdk) {
+                    log('Cannot test contract - Stellar SDK missing', 'error');
+                    return;
+                }
+
+                const server = new StellarSdk.SorobanRpc.Server(CONFIG.RPC_URL);
+                log(`Connecting to RPC: ${CONFIG.RPC_URL}`, 'info');
+                
+                const health = await server.getHealth();
+                log(`RPC Server Status: ${health.status}`, 'success');
+                
+                log('✅ All systems operational!', 'success');
+                log('You can now launch the main app', 'success');
+                
+            } catch (error) {
+                log(`RPC Connection Error: ${error.message}`, 'error');
+            }
+        }
+
+        function runTests() {
+            document.getElementById('result').innerHTML = '<h3>Running System Tests...</h3>';
+            
+            setTimeout(() => {
+                checkJavaScript();
+                const stellarOk = checkStellarSDK();
+                const freighterOk = checkFreighter();
+                const configOk = checkConfig();
+                
+                if (stellarOk && configOk) {
+                    testContractConnection();
+                } else {
+                    log('Cannot proceed with contract tests - fix errors above', 'error');
+                }
+            }, 100);
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkJavaScript();
+                checkStellarSDK();
+                checkFreighter();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
