@@ -90,7 +90,7 @@ const ContractService = (() => {
                     const values = item.value();
                     return {
                         address: StellarSdk.scValToNative(values[0]),
-                        ipfsHash: StellarSdk.scValToNative(values[1]),
+                        imageData: StellarSdk.scValToNative(values[1]), // Base64 string from contract
                         validated: StellarSdk.scValToNative(values[2])
                     };
                 });
@@ -408,12 +408,15 @@ const ContractService = (() => {
     }
 
     /**
-     * Get IPFS URL for image
+     * Get image data URL from base64 string stored in contract
      */
-    function getIPFSUrl(ipfsHash) {
-        // Remove ipfs:// prefix if present
-        const hash = ipfsHash.replace('ipfs://', '');
-        return `${CONFIG.IPFS_GATEWAY}${hash}`;
+    function getImageDataUrl(imageData) {
+        // If already has data URL prefix, return as is
+        if (imageData.startsWith('data:')) {
+            return imageData;
+        }
+        // Otherwise, add data URL prefix (assuming JPEG, but could detect type)
+        return `data:image/jpeg;base64,${imageData}`;
     }
 
     /**
@@ -434,6 +437,6 @@ const ContractService = (() => {
         getEvents,
         distributeToEvent,
         getContractStats,
-        getIPFSUrl
+        getImageDataUrl
     };
 })();

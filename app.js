@@ -286,7 +286,7 @@ const App = (() => {
             return `
                 <div class="participant-card ${statusClass}">
                     <div class="image-container" onclick="App.openImage('${participant.address}')">
-                        <img src="${ContractService.getIPFSUrl(participant.ipfsHash)}" 
+                        <img src="${ContractService.getImageDataUrl(participant.imageData)}" 
                              alt="${participant.address}"
                              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23222%22 width=%22200%22 height=%22200%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2300ff41%22>ERROR</text></svg>'">
                         <div class="status-badge">${statusIcon}</div>
@@ -362,9 +362,9 @@ const App = (() => {
         const participant = state.participants.find(p => p.address === address);
         if (!participant) return;
         
-        elements.modalImage.src = ContractService.getIPFSUrl(participant.ipfsHash);
+        elements.modalImage.src = ContractService.getImageDataUrl(participant.imageData);
         elements.modalAddress.textContent = participant.address;
-        elements.modalIpfs.textContent = participant.ipfsHash;
+        elements.modalIpfs.textContent = 'Base64 Image Data';
         elements.modalStatus.innerHTML = participant.validated 
             ? '<span class="badge badge-success">VALIDATED</span>'
             : '<span class="badge" style="background: #ffaa00; color: #000;">PENDING</span>';
